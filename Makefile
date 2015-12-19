@@ -1,6 +1,6 @@
 cc=clang++ -std=c++11
 target=tetris
-obj=main.o panel.o block.o score.o drawer.o shape.cc
+obj=main.o panel.o block.o score.o drawer.o point.cc
 
 tetris: $(obj)
 	$(cc) -o $(target) $(obj) -lncurses

@@ -4,8 +4,8 @@
 namespace tetris
 {
     class Panel;
-    class Shape;
     class Block;
+    class Point;
     
     class Drawer
     {
@@ -13,10 +13,10 @@ namespace tetris
         Drawer();
         ~Drawer();
 
-        void draw(const Shape & shape);
         void draw(const Block & block);
+        void draw(const Point & point);
 
-        void clear(const Shape & shape);
+        void clear(const Block & block);
 
     private:
         static const int WHITE = 1;

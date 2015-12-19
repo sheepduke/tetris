@@ -1,6 +1,6 @@
 #include "drawer.hh"
 #include "panel.hh"
-#include "shape.hh"
+#include "block.hh"
 #include <ncurses.h>
 
 using namespace std;
@@ -10,33 +10,33 @@ int main()
 {
     Drawer drawer;
     Panel panel(15, 20);
-    Shape * shape = new StickShape(4, 4);
+    Block * block = new StickBlock(4, 4);
 
-    drawer.draw(*shape);    
+    drawer.draw(*block);    
     refresh();
 
     int ch;
     while ((ch = getch()) != 'q')
     {
-        drawer.clear(*shape);
+        drawer.clear(*block);
         switch (ch)
         {
         case 'w':
-            shape->rotate(panel);
+            block->rotate(panel);
             break;
         case 'a':
-            shape->move_left(panel);
+            block->move_left(panel);
             break;
         case 'd':
-            shape->move_right(panel);
+            block->move_right(panel);
             break;
         case 's':
-            shape->move_down(panel);
+            block->move_down(panel);
             break;
         case ' ':
-            shape->drop(panel);
+            block->drop(panel);
         }
-        drawer.draw(*shape);
+        drawer.draw(*block);
     }
     
     refresh();

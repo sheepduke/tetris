@@ -1,8 +1,8 @@
 #include <ncurses.h>
 
 #include "drawer.hh"
-#include "shape.hh"
 #include "block.hh"
+#include "point.hh"
 
 namespace tetris
 {
@@ -33,50 +33,50 @@ namespace tetris
         endwin();
     }
 
-    void Drawer::draw(const Shape & shape)
+    void Drawer::draw(const Block & block)
     {
-        const vector<Block> & blocks = shape.get_blocks();
-        for (auto it = blocks.begin(); it != blocks.end(); it++)
+        const vector<Point> & points = block.get_points();
+        for (auto it = points.begin(); it != points.end(); it++)
         {
             draw(*it);
         }
     }
 
-    void Drawer::draw(const Block & block)
+    void Drawer::draw(const Point & point)
     {
         int color_pair = WHITE;
 
-        switch (block.color())
+        switch (point.color())
         {
-        case Block::WHITE:
+        case Point::WHITE:
             color_pair = WHITE;
             break;
-        case Block::RED:
+        case Point::RED:
             color_pair = RED;
             break;
-        case Block::GREEN:
+        case Point::GREEN:
             color_pair = GREEN;
             break;
-        case Block::YELLOW:
+        case Point::YELLOW:
             color_pair = YELLOW;
             break;
-        case Block::BLUE:
+        case Point::BLUE:
             color_pair = BLUE;
             break;
-        case Block::CYAN:
+        case Point::CYAN:
             color_pair = CYAN;
             break;
         }
         init_pair(9, COLOR_WHITE, COLOR_RED);
         attron(COLOR_PAIR(9));
-        mvprintw(block.y(), block.x(), "  ");
+        mvprintw(point.y(), point.x(), "  ");
         attroff(COLOR_PAIR(9));
     }
 
-    void Drawer::clear(const Shape & shape)
+    void Drawer::clear(const Block & block)
     {
-        const vector<Block> & blocks = shape.get_blocks();
-        for (auto it = blocks.begin(); it != blocks.end(); it++)
+        const vector<Point> & points = block.get_points();
+        for (auto it = points.begin(); it != points.end(); it++)
         {
             mvprintw(it->y(), it->x(), "  ");
         }
