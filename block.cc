@@ -1,5 +1,6 @@
 #include "block.hh"
 #include "panel.hh"
+#include "drawer.hh"
 
 using std::random_device;
 using std::make_pair;
@@ -9,8 +10,34 @@ using std::make_pair;
 namespace tetris
 {
     static random_device rd;
-    mt19937 Block::random_gen(rd());
-    uniform_int_distribution<int> Block::random_dis(1, 6);
+    mt19937 RandomBlockFactory::random_gen(rd());
+    uniform_int_distribution<int> RandomBlockFactory::random_dis(1, 6);
+
+    Block * RandomBlockFactory::create_block(int y, int x)
+    {
+        Block * block = NULL;
+
+        // switch (random_dis(random_gen))
+        // {
+        // case STICK:
+        //     block = new StickBlock(y, x);
+        //     break;
+        // case SQUARE:
+        //     block = new SquareBlock(y, x);
+        //     break;
+        // default:
+        //     block = new SquareBlock(y, x);
+        //     break;
+        // }
+
+        int random = random_dis(random_gen);
+        if (random % 2 == 0)
+            block = new StickBlock(y, x);
+        else
+            block = new SquareBlock(y, x);
+
+        return block;
+    }
 
     Block::Block()
     {
@@ -41,13 +68,13 @@ namespace tetris
             for (int i = 0; i < size; i++)
             {
                 if (!panel.is_legal(
-                        points[i].position_after_move(rules[angle][i].first,
+                        units[i].position_after_move(rules[angle][i].first,
                                                       rules[angle][i].second)))
                     return ;
             }
             for (int i = 0; i < size; i++)
             {
-                points[i].move(rules[angle][i].first, rules[angle][i].second);
+                units[i].move(rules[angle][i].first, rules[angle][i].second);
             }
         }
 
@@ -68,30 +95,9 @@ namespace tetris
         while (move_down(panel));
     }
 
-    const vector<Point> & Block::get_points() const
+    const vector<Unit> & Block::get_units() const
     {
-        return points;
-    }
-    
-    Point::Color Block::generate_random_color() const
-    {
-        switch (random_dis(random_gen))
-        {
-        case 1:
-            return Point::WHITE;
-        case 2:
-            return Point::RED;
-        case 3:
-            return Point::GREEN;
-        case 4:
-            return Point::YELLOW;
-        case 5:
-            return Point::BLUE;
-        case 6:
-            return Point::CYAN;
-        default:
-            return Point::WHITE;
-        }
+        return units;
     }
 
     int Block::find_next_rule(int rule) const
@@ -117,13 +123,13 @@ namespace tetris
             break;
         }
 
-        for (auto it = points.begin(); it != points.end(); it++)
+        for (auto it = units.begin(); it != units.end(); it++)
         {
             if (!panel.is_legal(it->position_after_move(var_y, var_x)))
                 return false;
         }
 
-        for (auto it = points.begin(); it != points.end(); it++)
+        for (auto it = units.begin(); it != units.end(); it++)
             it->move(var_y, var_x);
 
         return true;
@@ -132,29 +138,29 @@ namespace tetris
     // Stick Block
     StickBlock::StickBlock(int y, int x) : Block()
     {
-        Point::Color color = generate_random_color();
-        points.push_back(Point(y, x, color));
-        points.push_back(Point(y-1, x, color));
-        points.push_back(Point(y-2, x, color));
-        points.push_back(Point(y-3, x, color));
+        Unit::Color color = Unit::RED;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y+1, x, color));
+        units.push_back(Unit(y+2, x, color));
+        units.push_back(Unit(y+3, x, color));
 
-        rules[0].push_back(make_pair(-1, 1));
-        rules[0].push_back(make_pair(0, 0));
-        rules[0].push_back(make_pair(1, -1));
-        rules[0].push_back(make_pair(2, -2));
+        rules[0].push_back(make_pair(2, 1));
+        rules[0].push_back(make_pair(1, 0));
+        rules[0].push_back(make_pair(0, -1));
+        rules[0].push_back(make_pair(-1, -2));
 
-        rules[2].push_back(make_pair(1, -1));
-        rules[2].push_back(make_pair(0, 0));
-        rules[2].push_back(make_pair(-1, 1));
-        rules[2].push_back(make_pair(-2, 2));
+        rules[2].push_back(make_pair(-2, -1));
+        rules[2].push_back(make_pair(-1, 0));
+        rules[2].push_back(make_pair(0, 1));
+        rules[2].push_back(make_pair(1, 2));
     }
 
     SquareBlock::SquareBlock(int y, int x) : Block()
     {
-        Point::Color color = generate_random_color();
-        points.push_back(Point(y, x, color));
-        points.push_back(Point(y-1, x, color));
-        points.push_back(Point(y-1, x+1, color));
-        points.push_back(Point(y, x+1, color));
+        Unit::Color color = Unit::WHITE;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y, x+1, color));
+        units.push_back(Unit(y+1, x, color));
+        units.push_back(Unit(y+1, x+1, color));
     }
 }

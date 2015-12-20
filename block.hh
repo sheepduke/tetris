@@ -4,7 +4,7 @@
 #include <vector>
 #include <random>
 
-#include "point.hh"
+#include "unit.hh"
 
 using std::mt19937;
 using std::uniform_int_distribution;
@@ -13,12 +13,30 @@ using std::pair;
 
 namespace tetris
 {
+    class Drawer;
     class Panel;
-    
+    class Block;
+
+    class RandomBlockFactory
+    {
+    public:
+        static Block * create_block(int y, int x);
+
+    private:
+        typedef int BlockType;
+        
+        static const BlockType STICK = 1;
+        static const BlockType SQUARE = 2;
+
+        static mt19937 random_gen;
+        static uniform_int_distribution<int> random_dis;
+    };
+
     class Block
     {
     public:
         Block();
+        virtual ~Block() {};
 
         // Move to left for one unit.
         // This function will first check if it's legal to move.
@@ -29,8 +47,8 @@ namespace tetris
         bool move_down(const Panel & panel);
         void rotate(const Panel & panel);
         void drop(const Panel & panel);
-        
-        const vector<Point> & get_points() const;
+
+        const vector<Unit> & get_units() const;
 
     protected:
         static const int DEGREE_0 = 0;
@@ -38,9 +56,7 @@ namespace tetris
         static const int DEGREE_180 = 2;
         static const int DEGREE_270 = 3;
 
-        Point::Color generate_random_color() const;
-        
-        vector<Point> points;
+        vector<Unit> units;
         vector<vector<pair<int, int> > > rules;
         int angle;
 
@@ -52,17 +68,14 @@ namespace tetris
 
         int find_next_rule(int rule) const;
         bool move(const Panel & panel, Direction direction);
-        
-        static mt19937 random_gen;
-        static uniform_int_distribution<int> random_dis;
     };
 
     /**
      * Block of stick.
-     *           *
-     *           *
-     *           *
-     *           *
+     *           0
+     *           1
+     *           2
+     *           3
      * This block has two angles: vertical stick and horizonal stick.
      */
     class StickBlock : public Block
@@ -72,9 +85,9 @@ namespace tetris
     };
 
     /**
-     * Block of four points consisting a square.
-     *           **
-     *           **
+     * Block of four units consisting a square.
+     *           01
+     *           23
      **/
     class SquareBlock : public Block
     {

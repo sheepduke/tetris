@@ -1,24 +1,24 @@
 #include "panel.hh"
-#include "score.hh"
 #include "block.hh"
 
 namespace tetris
 {
-    Panel::Panel(int max_y, int max_x)
+    Panel::Panel(int height, int width)
     {
-        this->max_y = max_y;
-        this->max_x = max_x;
-        blocks.resize(max_y);
+        m_height = height;
+        m_width = width;
+        blocks.resize(height);
         for (auto it = blocks.begin(); it != blocks.end(); it++)
         {
-            it->assign(max_x, false);
+            it->assign(width, false);
         }
+        score = 0;
     }
 
-    void Panel::clear_full_lines(Score & score)
+    void Panel::clear_full_lines()
     {
         int full_lines;
-        score.handle_full_lines(full_lines);
+        score += (10 + 5 * (full_lines - 1)) * full_lines;
     }
 
     bool Panel::is_legal(const Position & pos) const
@@ -28,13 +28,18 @@ namespace tetris
     
     bool Panel::is_legal(int y, int x) const
     {
-        if (y < 0 || y >= max_y || x < 0 || x >= max_x)
+        if (y < 0 || y >= m_height || x < 0 || x >= m_width)
             return false;
         return !blocks[y][x];
     }
 
-    int Panel::get_center_x() const
+    int Panel::height() const
     {
-        return max_x / 2;
+        return m_height;
+    }
+
+    int Panel::width() const
+    {
+        return m_width;
     }
 }

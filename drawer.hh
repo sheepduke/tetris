@@ -1,30 +1,45 @@
 #ifndef DRAWER_HH
 #define DRAWER_HH
 
+#include <map>
+#include <ncurses.h>
+
+using std::map;
+
 namespace tetris
 {
     class Panel;
+    class StickBlock;
+    class SquareBlock;
     class Block;
-    class Point;
+    class Unit;
     
     class Drawer
     {
     public:
-        Drawer();
+        Drawer(int panel_height, int panel_width);
         ~Drawer();
 
-        void draw(const Block & block);
-        void draw(const Point & point);
+        void draw(Block * block);
+        void draw(const StickBlock & block);
+        void draw(const SquareBlock & block);
 
         void clear(const Block & block);
 
+        static const int UNIT_HEIGHT = 3;
+        static const int UNIT_WIDTH = 5;
+
     private:
-        static const int WHITE = 1;
-        static const int RED = 2;
-        static const int GREEN = 3;
-        static const int YELLOW = 4;
-        static const int BLUE = 5;
-        static const int CYAN = 6;
+        // Draw a unit.
+        // offset_y is the offset that this function will take while
+        // drawing the height. offset_x is for the width.
+        void draw(const Unit & unit, int offset_y = 0, int offset_x = 0);
+        void refresh();
+
+        WINDOW * game_window;
+        WINDOW * score_window;
+
+        map<const Unit *, WINDOW *> window_table;
     };
 }
 

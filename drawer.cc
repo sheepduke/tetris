@@ -1,84 +1,131 @@
-#include <ncurses.h>
-
 #include "drawer.hh"
 #include "block.hh"
-#include "point.hh"
+#include "unit.hh"
+
+#include <string>
+
+using std::string;
 
 namespace tetris
 {
-    Drawer::Drawer()
+    Drawer::Drawer(int panel_height, int panel_width)
     {
         initscr();
-        // use color
-        start_color();
-        // disable line buffer
-        raw();
-        // capture arrow key etc.
-        keypad(stdscr, TRUE);
-        // don't display user's input
-        noecho();
-        // don't display cursor
-        curs_set(0);
+        start_color();          // use color
+        cbreak();               // disable line buffer
+        keypad(stdscr, TRUE);   // capture arrow key etc.
+        noecho();               // don't display user's input
+        curs_set(0);            // don't display cursor
+        
         // initialize color pairs
-        init_pair(WHITE, COLOR_BLACK, COLOR_WHITE);
-        init_pair(RED, COLOR_BLACK, COLOR_RED);
-        init_pair(GREEN, COLOR_BLACK, COLOR_GREEN);
-        init_pair(YELLOW, COLOR_BLACK, COLOR_YELLOW);
-        init_pair(BLUE, COLOR_BLACK, COLOR_BLUE);
-        init_pair(CYAN, COLOR_BLACK, COLOR_CYAN);
+        init_pair(Unit::WHITE, COLOR_BLACK, COLOR_WHITE);
+        init_pair(Unit::RED, COLOR_BLACK, COLOR_RED);
+        init_pair(Unit::GREEN, COLOR_BLACK, COLOR_GREEN);
+        init_pair(Unit::YELLOW, COLOR_BLACK, COLOR_YELLOW);
+        init_pair(Unit::BLUE, COLOR_BLACK, COLOR_BLUE);
+        init_pair(Unit::CYAN, COLOR_BLACK, COLOR_CYAN);
+
+        // set windows according to panel_size
+        panel_height = (panel_height) * (UNIT_HEIGHT - 1) + 1;
+        panel_width = (panel_width) * (UNIT_WIDTH - 1) + 1;
+        int max_height;
+        int max_width;
+        getmaxyx(stdscr, max_height, max_width);
+        int height = (panel_height >= max_height) ? max_height : panel_height;
+        int width = (panel_width >= max_width) ? max_width : panel_width;
+
+        // initialize windows
+        game_window = newwin(height, width, 0, 0);
+        score_window = newwin(height, max_width - width, 0, width);
+
+        // draw the border of windows
+        box(game_window, 0, 0);
+        box(score_window, 0, 0);
+        // refresh windows
+        wrefresh(game_window);
+        wrefresh(score_window);
     }
 
     Drawer::~Drawer()
     {
+        delwin(game_window);
+        delwin(score_window);
         endwin();
     }
 
-    void Drawer::draw(const Block & block)
+    void Drawer::draw(Block * block)
     {
-        const vector<Point> & points = block.get_points();
-        for (auto it = points.begin(); it != points.end(); it++)
-        {
-            draw(*it);
-        }
+        if (dynamic_cast<StickBlock *>(block) != NULL)
+            draw(*dynamic_cast<StickBlock *>(block));
+        else if (dynamic_cast<SquareBlock *>(block) != NULL)
+            draw(*dynamic_cast<SquareBlock *>(block));
     }
 
-    void Drawer::draw(const Point & point)
+    void Drawer::draw(const StickBlock & block)
     {
-        int color_pair = WHITE;
+        auto & units = block.get_units();
+        draw(units[0]);
+        draw(units[1], -1, 0);
+        draw(units[2], -2, 0);
+        draw(units[3], -3, 0);
+        refresh();
+    }
 
-        switch (point.color())
-        {
-        case Point::WHITE:
-            color_pair = WHITE;
-            break;
-        case Point::RED:
-            color_pair = RED;
-            break;
-        case Point::GREEN:
-            color_pair = GREEN;
-            break;
-        case Point::YELLOW:
-            color_pair = YELLOW;
-            break;
-        case Point::BLUE:
-            color_pair = BLUE;
-            break;
-        case Point::CYAN:
-            color_pair = CYAN;
-            break;
-        }
-        init_pair(9, COLOR_WHITE, COLOR_RED);
-        attron(COLOR_PAIR(9));
-        mvprintw(point.y(), point.x(), "  ");
-        attroff(COLOR_PAIR(9));
+    void Drawer::draw(const SquareBlock & block)
+    {
+        auto & units = block.get_units();
+        draw(units[0]);
+        draw(units[1], 0, -1);
+        draw(units[2], -1, 0);
+        draw(units[3], -1, -1);
+        refresh();
+    }
+
+    void Drawer::draw(const Unit & unit, int offset_y, int offset_x)
+    {
+        WINDOW * win = newwin(UNIT_HEIGHT, UNIT_WIDTH,
+                              unit.y() * UNIT_HEIGHT + offset_y,
+                              unit.x() * UNIT_WIDTH + offset_x);
+        // wattron(win, COLOR_PAIR(color_pair) | A_REVERSE);
+        wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+        // wattroff(win, COLOR_PAIR(color_pair) | A_REVERSE);
+        wattron(win, COLOR_PAIR(unit.color()));
+        mvwprintw(win, 1, 1, string(UNIT_WIDTH - 2, ' ').c_str());
+        wattroff(win, COLOR_PAIR(unit.color()));
+        window_table[&unit] = win;
     }
 
     void Drawer::clear(const Block & block)
     {
-        const vector<Point> & points = block.get_points();
-        for (auto it = points.begin(); it != points.end(); it++)
+        // auto & units = block.get_units();
+        // for (auto it = units.cbegin(); it != units.cend(); it++)
+        // {
+        //     WINDOW * win = window_table[&*it];
+        //     if (win != NULL)
+        //     {
+        //         wborder(win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
+        //         mvwprintw(win, 1, 1, string(UNIT_WIDTH - 2, ' ').c_str());
+        //         wrefresh(win);
+        //         delwin(win);
+        //         window_table.erase(&*it);
+        //     }
+        // }
+        // refresh();
+
+        // werase(game_window);
+        // werase(score_window);
+        refresh();
+    }
+
+    void Drawer::refresh()
+    {
+        for (auto it = window_table.begin(); it != window_table.end(); it++)
         {
-            mvprintw(it->y(), it->x(), "  ");
+            wrefresh(it->second);
         }
+        // box(game_window, 0, 0);
+        wrefresh(game_window);
+        // box(score_window, 0, 0);
+        wrefresh(score_window);
     }
 }

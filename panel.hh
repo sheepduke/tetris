@@ -7,22 +7,27 @@ using std::vector;
 
 namespace tetris
 {
-    class Score;
     struct Position;
     
     class Panel
     {
     public:
-        Panel(int max_y, int max_x);
-        void clear_full_lines(Score & rule);
+        Panel(int height, int width);
+        void clear_full_lines();
+
+        // Check if `pos' or position (y, x) is a legal point
+        // that can hold a single point.
         bool is_legal(const Position & pos) const;
         bool is_legal(int y, int x) const;
-        int get_center_x() const;
+
+        int height() const;
+        int width() const;
 
     private:
-        int max_x;
-        int max_y;
+        int m_height;
+        int m_width;
         vector<vector<bool> > blocks;
+        int score;
     };
 }
 
