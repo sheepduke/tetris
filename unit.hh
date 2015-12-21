@@ -3,18 +3,41 @@
 
 namespace tetris
 {
-    struct Position
+    class Position
     {
+    public:
         Position() {}
         Position(int y, int x)
         {
-            this->y = y;
-            this->x = x;
+            m_y = y;
+            m_x = x;
         }
-        int x;
-        int y;
-    };
 
+        int y() const
+        {
+            return m_y;
+        }
+
+        void set_y(int y)
+        {
+            m_y = y;
+        }
+
+        int x() const
+        {
+            return m_x;
+        }
+
+        void set_x(int x)
+        {
+            m_x = x;
+        }
+
+    private:
+        int m_x;
+        int m_y;
+    };
+    
     class Unit
     {
     public:
@@ -28,6 +51,7 @@ namespace tetris
         static const Color CYAN = 6;
 
         Unit(int y, int x, Color color);
+        Unit(const Unit & unit);
 
         Position position_after_move(int units_y, int units_x) const;
         void move(int units_y, int units_x);

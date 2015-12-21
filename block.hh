@@ -17,9 +17,13 @@ namespace tetris
     class Panel;
     class Block;
 
+    /**
+     * This class is used for creating blocks.
+     */
     class RandomBlockFactory
     {
     public:
+        // create a block with random type with y and x as height and width
         static Block * create_block(int y, int x);
 
     private:
@@ -36,7 +40,6 @@ namespace tetris
     {
     public:
         Block();
-        virtual ~Block() {};
 
         // Move to left for one unit.
         // This function will first check if it's legal to move.

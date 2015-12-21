@@ -1,10 +1,9 @@
 #ifndef DRAWER_HH
 #define DRAWER_HH
 
-#include <map>
 #include <ncurses.h>
 
-using std::map;
+#include "panel.hh"
 
 namespace tetris
 {
@@ -14,18 +13,27 @@ namespace tetris
     class Block;
     class Unit;
     
-    class Drawer
+    class Drawer : public PanelVisitor
     {
     public:
         Drawer(int panel_height, int panel_width);
         ~Drawer();
 
-        void draw(Block * block);
+        // draw different shapes of blocks
+        void draw(const Block & block);
         void draw(const StickBlock & block);
         void draw(const SquareBlock & block);
 
-        void clear(const Block & block);
+        // clear the block
+        void clear(Block * block);
+        
+        // draw the panel
+        void draw(const Panel & panel);
 
+        // virtual function from PanelVisitor
+        virtual void visit(Unit * unit);
+
+    protected:
         static const int UNIT_HEIGHT = 3;
         static const int UNIT_WIDTH = 5;
 
@@ -33,13 +41,12 @@ namespace tetris
         // Draw a unit.
         // offset_y is the offset that this function will take while
         // drawing the height. offset_x is for the width.
-        void draw(const Unit & unit, int offset_y = 0, int offset_x = 0);
-        void refresh();
+        void draw(const Unit & unit);
+
+        Position get_scaled_position(const Unit & unit) const;
 
         WINDOW * game_window;
         WINDOW * score_window;
-
-        map<const Unit *, WINDOW *> window_table;
     };
 }
 

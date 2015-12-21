@@ -28,6 +28,9 @@ namespace tetris
         // set windows according to panel_size
         panel_height = (panel_height) * (UNIT_HEIGHT - 1) + 1;
         panel_width = (panel_width) * (UNIT_WIDTH - 1) + 1;
+        // leave the border alone!
+        panel_height += 2;
+        panel_width += 2;
         int max_height;
         int max_width;
         getmaxyx(stdscr, max_height, max_width);
@@ -41,6 +44,7 @@ namespace tetris
         // draw the border of windows
         box(game_window, 0, 0);
         box(score_window, 0, 0);
+        wprintw(game_window, "%d", panel_height);
         // refresh windows
         wrefresh(game_window);
         wrefresh(score_window);
@@ -53,79 +57,65 @@ namespace tetris
         endwin();
     }
 
-    void Drawer::draw(Block * block)
-    {
-        if (dynamic_cast<StickBlock *>(block) != NULL)
-            draw(*dynamic_cast<StickBlock *>(block));
-        else if (dynamic_cast<SquareBlock *>(block) != NULL)
-            draw(*dynamic_cast<SquareBlock *>(block));
-    }
-
-    void Drawer::draw(const StickBlock & block)
+    void Drawer::draw(const Block & block)
     {
         auto & units = block.get_units();
-        draw(units[0]);
-        draw(units[1], -1, 0);
-        draw(units[2], -2, 0);
-        draw(units[3], -3, 0);
-        refresh();
-    }
-
-    void Drawer::draw(const SquareBlock & block)
-    {
-        auto & units = block.get_units();
-        draw(units[0]);
-        draw(units[1], 0, -1);
-        draw(units[2], -1, 0);
-        draw(units[3], -1, -1);
-        refresh();
-    }
-
-    void Drawer::draw(const Unit & unit, int offset_y, int offset_x)
-    {
-        WINDOW * win = newwin(UNIT_HEIGHT, UNIT_WIDTH,
-                              unit.y() * UNIT_HEIGHT + offset_y,
-                              unit.x() * UNIT_WIDTH + offset_x);
-        // wattron(win, COLOR_PAIR(color_pair) | A_REVERSE);
-        wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
-        // wattroff(win, COLOR_PAIR(color_pair) | A_REVERSE);
-        wattron(win, COLOR_PAIR(unit.color()));
-        mvwprintw(win, 1, 1, string(UNIT_WIDTH - 2, ' ').c_str());
-        wattroff(win, COLOR_PAIR(unit.color()));
-        window_table[&unit] = win;
-    }
-
-    void Drawer::clear(const Block & block)
-    {
-        // auto & units = block.get_units();
-        // for (auto it = units.cbegin(); it != units.cend(); it++)
-        // {
-        //     WINDOW * win = window_table[&*it];
-        //     if (win != NULL)
-        //     {
-        //         wborder(win, ' ', ' ', ' ',' ',' ',' ',' ',' ');
-        //         mvwprintw(win, 1, 1, string(UNIT_WIDTH - 2, ' ').c_str());
-        //         wrefresh(win);
-        //         delwin(win);
-        //         window_table.erase(&*it);
-        //     }
-        // }
-        // refresh();
-
-        // werase(game_window);
-        // werase(score_window);
-        refresh();
-    }
-
-    void Drawer::refresh()
-    {
-        for (auto it = window_table.begin(); it != window_table.end(); it++)
+        
+        for (auto it = units.begin(); it != units.end(); it++)
         {
-            wrefresh(it->second);
+            draw(*it);
         }
-        // box(game_window, 0, 0);
+    }
+
+    void Drawer::clear(Block * block)
+    {
+        auto & units = block->get_units();
+
+        for (auto it = units.begin(); it != units.end(); it++)
+        {
+            Position pos = get_scaled_position(*it);
+            for (int i = 0; i < 3; i++)
+                mvwprintw(game_window, pos.y() + i, pos.x(), "     ");
+        }
         wrefresh(game_window);
-        // box(score_window, 0, 0);
-        wrefresh(score_window);
+    }
+
+    void Drawer::draw(const Panel & panel)
+    {
+        panel.traverse(this);
+    }
+    
+    void Drawer::visit(Unit * unit)
+    {
+        if (unit)
+            draw(*unit);
+    }
+
+    void Drawer::draw(const Unit & unit)
+    {
+        Position pos = get_scaled_position(unit);
+
+        // print top and bottom
+        for (int y = pos.y(); y <= pos.y() + 2; y += 2)
+        {
+            mvwprintw(game_window, y, pos.x(), "+");
+            for (int i = 1; i <= 3; i++)
+                mvwprintw(game_window, y, pos.x() + i, "-");
+            mvwprintw(game_window, y, pos.x() + 4, "+");
+        }
+        
+        mvwprintw(game_window, pos.y() + 1, pos.x(), "|");
+        wattron(game_window, COLOR_PAIR(unit.color()));
+        for (int i = 1; i <= 3; i++)
+            mvwprintw(game_window, pos.y() + 1, pos.x() + i, " ");
+        wattroff(game_window, COLOR_PAIR(unit.color()));
+        mvwprintw(game_window, pos.y() + 1, pos.x() + 4, "|");
+        wrefresh(game_window);
+    }
+
+    Position Drawer::get_scaled_position(const Unit & unit) const
+    {
+        return Position(unit.y() * (UNIT_HEIGHT - 1) + 1,
+                        unit.x() * (UNIT_WIDTH - 1) + 1);
     }
 }
