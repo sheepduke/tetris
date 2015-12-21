@@ -8,7 +8,7 @@ using std::string;
 
 namespace tetris
 {
-    Drawer::Drawer(int panel_height, int panel_width)
+    Drawer::Drawer()
     {
         initscr();
         start_color();          // use color
@@ -25,26 +25,34 @@ namespace tetris
         init_pair(Unit::BLUE, COLOR_BLACK, COLOR_BLUE);
         init_pair(Unit::CYAN, COLOR_BLACK, COLOR_CYAN);
 
-        // set windows according to panel_size
-        panel_height = (panel_height) * (UNIT_HEIGHT - 1) + 1;
-        panel_width = (panel_width) * (UNIT_WIDTH - 1) + 1;
-        // leave the border alone!
-        panel_height += 2;
-        panel_width += 2;
         int max_height;
         int max_width;
         getmaxyx(stdscr, max_height, max_width);
-        int height = (panel_height >= max_height) ? max_height : panel_height;
-        int width = (panel_width >= max_width) ? max_width : panel_width;
+
+        // calculate the panel size
+        panel_height = (max_height - 3) / (UNIT_HEIGHT - 1);
+        // panel_width = (max_width - 3) / (UNIT_WIDTH - 1);
+        panel_width = PANEL_WIDTH;
+
+        window_height = panel_height * (UNIT_HEIGHT - 1) + 3;
+        window_width = panel_width * (UNIT_WIDTH - 1) + 3;
+
+        // // set windows according to panel_size
+        // panel_height = (panel_height) * (UNIT_HEIGHT - 1) + 1;
+        // panel_width = (panel_width) * (UNIT_WIDTH - 1) + 1;
+        // // leave the border alone!
+        // panel_height += 2;
+        // panel_width += 2;
+        // int height = (panel_height >= max_height) ? max_height : panel_height;
+        // int width = (panel_width >= max_width) ? max_width : panel_width;
 
         // initialize windows
-        game_window = newwin(height, width, 0, 0);
-        score_window = newwin(height, max_width - width, 0, width);
+        game_window = newwin(window_height, window_width, 0, 0);
+        score_window = newwin(window_height, max_width - window_width, 0, window_width);
 
         // draw the border of windows
         box(game_window, 0, 0);
         box(score_window, 0, 0);
-        wprintw(game_window, "%d", panel_height);
         // refresh windows
         wrefresh(game_window);
         wrefresh(score_window);
@@ -55,6 +63,12 @@ namespace tetris
         delwin(game_window);
         delwin(score_window);
         endwin();
+    }
+
+    void Drawer::get_panel_size(int & height, int & width)
+    {
+        height = panel_height;
+        width = panel_width;
     }
 
     void Drawer::draw(const Block & block)

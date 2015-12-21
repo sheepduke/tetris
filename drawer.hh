@@ -16,8 +16,10 @@ namespace tetris
     class Drawer : public PanelVisitor
     {
     public:
-        Drawer(int panel_height, int panel_width);
+        Drawer();
         ~Drawer();
+
+        void get_panel_size(int & height, int & width);
 
         // draw different shapes of blocks
         void draw(const Block & block);
@@ -34,6 +36,7 @@ namespace tetris
         virtual void visit(Unit * unit);
 
     protected:
+        static const int PANEL_WIDTH = 10;
         static const int UNIT_HEIGHT = 3;
         static const int UNIT_WIDTH = 5;
 
@@ -47,6 +50,11 @@ namespace tetris
 
         WINDOW * game_window;
         WINDOW * score_window;
+
+        int panel_height;
+        int panel_width;
+        int window_height;
+        int window_width;
     };
 }
 

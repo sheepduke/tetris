@@ -26,9 +26,13 @@ bool end_program = false;
 
 int main()
 {
-    Panel panel(20, 10);
-    Drawer drawer(20, 10);
-    Block * block = RandomBlockFactory::create_block(0, 0);
+    Drawer drawer;
+
+    int height, width;
+    drawer.get_panel_size(height, width);
+
+    Panel panel(height, width);
+    Block * block = RandomBlockFactory::create_block(0, 4);
 
 
     // thread draw_thread(draw, &drawer, &panel, block);
@@ -70,11 +74,21 @@ int main()
     drawer.draw(panel);
 
     drawer.draw(*block);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    drawer.clear(block);
-    block->move_down(panel);
-    drawer.draw(*block);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    while (true)
+    {
+        drawer.clear(block);
+        if (!block->move_down(panel))
+        {
+            panel.fix_block(*block);
+            drawer.draw(panel);
+            delete block;
+            break;
+        }
+        drawer.draw(*block);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    
     return 0;
 }

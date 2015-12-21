@@ -14,10 +14,6 @@ namespace tetris
             it->assign(width, NULL);
         }
         score = 0;
-        for (int i = 0; i < width; i++)
-        {
-            units[height - 1][i] = new Unit(height - 1, i, Unit::RED);
-        }
     }
 
     Panel::~Panel()
@@ -32,13 +28,15 @@ namespace tetris
             row->clear();
         }
     }
-
+    
     void Panel::fix_block(const Block & block)
     {
-        auto & units = block.get_units();
-        for (auto unit = units.begin(); unit != units.end(); unit++)
+        auto & new_units = block.get_units();
+        for (auto it = new_units.begin(); it != new_units.end(); it++)
         {
+            units[it->y()][it->x()] = new Unit(*it);
         }
+        clear_full_lines();
     }
 
     void Panel::clear_full_lines()

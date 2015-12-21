@@ -2,8 +2,10 @@
 #define PANEL_HH
 
 #include <vector>
+#include <list>
 
 using std::vector;
+using std::list;
 
 namespace tetris
 {
@@ -39,7 +41,7 @@ namespace tetris
     private:
         int m_height;
         int m_width;
-        vector<vector<Unit *> > units;
+        list<vector<Unit *> > units;
         int score;
     };
 }
