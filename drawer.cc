@@ -37,15 +37,6 @@ namespace tetris
         window_height = panel_height * (UNIT_HEIGHT - 1) + 3;
         window_width = panel_width * (UNIT_WIDTH - 1) + 3;
 
-        // // set windows according to panel_size
-        // panel_height = (panel_height) * (UNIT_HEIGHT - 1) + 1;
-        // panel_width = (panel_width) * (UNIT_WIDTH - 1) + 1;
-        // // leave the border alone!
-        // panel_height += 2;
-        // panel_width += 2;
-        // int height = (panel_height >= max_height) ? max_height : panel_height;
-        // int width = (panel_width >= max_width) ? max_width : panel_width;
-
         // initialize windows
         game_window = newwin(window_height, window_width, 0, 0);
         score_window = newwin(window_height, max_width - window_width, 0, window_width);
@@ -81,9 +72,9 @@ namespace tetris
         }
     }
 
-    void Drawer::clear(Block * block)
+    void Drawer::clear(const Block & block)
     {
-        auto & units = block->get_units();
+        auto & units = block.get_units();
 
         for (auto it = units.begin(); it != units.end(); it++)
         {
@@ -103,6 +94,17 @@ namespace tetris
         mvwprintw(score_window, 5, 3, "%dx%d", panel.height(), panel.width());
         wrefresh(game_window);
         wrefresh(score_window);
+
+        // debug
+        for (int i = 0; i < 21; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                mvwprintw(score_window, i+3, j+3, "%d",
+                          (panel.is_legal(i, j) ? 1 : 0));
+            }
+        }
+        wrefresh(score_window);
     }
     
     void Drawer::visit(Unit * unit)
@@ -111,9 +113,14 @@ namespace tetris
             draw(*unit);
     }
 
-    void Drawer::draw(const Unit & unit)
+    int Drawer::user_input() const
     {
-        Position pos = get_scaled_position(unit);
+        return wgetch(game_window);
+    }
+
+    void Drawer::draw(const Unit & unit, int offset_y, int offset_x)
+    {
+        Position pos = get_scaled_position(unit, offset_y, offset_x);
 
         // print top and bottom
         for (int y = pos.y(); y <= pos.y() + 2; y += 2)
@@ -133,7 +140,8 @@ namespace tetris
         wrefresh(game_window);
     }
 
-    Position Drawer::get_scaled_position(const Unit & unit) const
+    Position Drawer::get_scaled_position(const Unit & unit,
+                                         int offset_y, int offset_x) const
     {
         return Position(unit.y() * (UNIT_HEIGHT - 1) + 1,
                         unit.x() * (UNIT_WIDTH - 1) + 1);

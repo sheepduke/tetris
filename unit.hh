@@ -60,6 +60,9 @@ namespace tetris
         int x() const;
         int y() const;
 
+        void set_x(int x);
+        void set_y(int y);
+
     private:
         Color m_color;
         Position pos;

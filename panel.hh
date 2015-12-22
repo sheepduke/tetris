@@ -38,6 +38,9 @@ namespace tetris
 
         void traverse(PanelVisitor * visitor) const;
 
+        // debug
+        void print_test();
+
     private:
         int m_height;
         int m_width;

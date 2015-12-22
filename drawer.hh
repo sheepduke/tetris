@@ -27,13 +27,15 @@ namespace tetris
         void draw(const SquareBlock & block);
 
         // clear the block
-        void clear(Block * block);
+        void clear(const Block & block);
         
         // draw the panel
         void draw(const Panel & panel);
 
         // virtual function from PanelVisitor
         virtual void visit(Unit * unit);
+
+        int user_input() const;
 
     protected:
         static const int PANEL_WIDTH = 10;
@@ -44,9 +46,10 @@ namespace tetris
         // Draw a unit.
         // offset_y is the offset that this function will take while
         // drawing the height. offset_x is for the width.
-        void draw(const Unit & unit);
+        void draw(const Unit & unit, int offset_y = 0, int offset_x = 0);
 
-        Position get_scaled_position(const Unit & unit) const;
+        Position get_scaled_position(const Unit & unit,
+                                     int offset_y = 0, int offset_x = 0) const;
 
         WINDOW * game_window;
         WINDOW * score_window;

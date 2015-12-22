@@ -77,7 +77,7 @@ namespace tetris
      * Block of stick.
      *           0
      *           1
-     *           2
+     *      3 2 2/1 0
      *           3
      * This block has two angles: vertical stick and horizonal stick.
      */

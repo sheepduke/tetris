@@ -18,13 +18,13 @@ namespace tetris
 
     Position Unit::position_after_move(int units_y, int units_x) const
     {
-        return Position(pos.y() + units_y, pos.x() + units_x * 2);
+        return Position(pos.y() + units_y, pos.x() + units_x);
     }
 
     void Unit::move(int units_y, int units_x)
     {
         pos.set_y(pos.y() + units_y);
-        pos.set_x(pos.x() + units_x * 2);
+        pos.set_x(pos.x() + units_x);
     }
 
     Unit::Color Unit::color() const
@@ -40,5 +40,15 @@ namespace tetris
     int Unit::y() const
     {
         return pos.y();
+    }
+
+    void Unit::set_x(int x)
+    {
+        pos.set_x(x);
+    }
+
+    void Unit::set_y(int y)
+    {
+        pos.set_y(y);
     }
 }
