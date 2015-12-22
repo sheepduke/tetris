@@ -96,7 +96,13 @@ namespace tetris
 
     void Drawer::draw(const Panel & panel)
     {
+        wclear(game_window);
+        box(game_window, 0, 0);
         panel.traverse(this);
+        mvwprintw(score_window, 3, 3, "%d", panel.score());
+        mvwprintw(score_window, 5, 3, "%dx%d", panel.height(), panel.width());
+        wrefresh(game_window);
+        wrefresh(score_window);
     }
     
     void Drawer::visit(Unit * unit)

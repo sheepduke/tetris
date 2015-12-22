@@ -13,7 +13,7 @@ namespace tetris
         {
             it->assign(width, NULL);
         }
-        score = 0;
+        m_score = 0;
     }
 
     Panel::~Panel()
@@ -41,9 +41,35 @@ namespace tetris
 
     void Panel::clear_full_lines()
     {
-        int full_lines = 0;
+        int full_line_number = 0;
 
-        score += (10 + 5 * (full_lines - 1)) * full_lines;
+        for (auto row = units.begin(); row != units.end(); row++)
+        {
+            bool is_line_full = true;
+            for (auto it = row->begin(); it != row->end(); it++)
+            {
+                // check if this line is full, set the flag to false if not
+                if (*it == NULL)
+                {
+                    is_line_full = false;
+                    break;
+                }
+            }
+            // remove this line
+            if (is_line_full)
+            {
+                full_line_number++;
+                for (auto it = row->begin(); it != row->end(); it++)
+                {
+                    delete *it;
+                    *it = NULL;
+                }
+                units.erase(row);
+                row--;
+                units.insert(units.begin(), *row);
+            }
+        }
+        m_score += (10 + 5 * (full_line_number - 1)) * full_line_number;
     }
 
     bool Panel::is_legal(const Position & pos) const
@@ -66,6 +92,11 @@ namespace tetris
     int Panel::width() const
     {
         return m_width;
+    }
+
+    int Panel::score() const
+    {
+        return m_score;
     }
 
     void Panel::traverse(PanelVisitor * visitor) const

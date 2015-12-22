@@ -2,10 +2,8 @@
 #define PANEL_HH
 
 #include <vector>
-#include <list>
 
 using std::vector;
-using std::list;
 
 namespace tetris
 {
@@ -36,13 +34,15 @@ namespace tetris
         int height() const;
         int width() const;
 
+        int score() const;
+
         void traverse(PanelVisitor * visitor) const;
 
     private:
         int m_height;
         int m_width;
-        list<vector<Unit *> > units;
-        int score;
+        vector<vector<Unit *> > units;
+        int m_score;
     };
 }
 

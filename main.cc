@@ -71,23 +71,28 @@ int main()
     // }
 
     // draw_thread.join();
-    drawer.draw(panel);
 
-    drawer.draw(*block);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    while (true)
+    for (int i = 0; i < 10; i+=2)
     {
-        drawer.clear(block);
-        if (!block->move_down(panel))
-        {
-            panel.fix_block(*block);
-            drawer.draw(panel);
-            delete block;
-            break;
-        }
+        drawer.draw(panel);
+        // block = RandomBlockFactory::create_block(0, 4);
+        block = new SquareBlock(9, i);
         drawer.draw(*block);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        while (true)
+        {
+            drawer.clear(block);
+            if (!block->move_down(panel))
+            {
+                panel.fix_block(*block);
+                drawer.draw(panel);
+                delete block;
+                break;
+            }
+            drawer.draw(*block);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
     }
+    drawer.draw(panel);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     
     return 0;
