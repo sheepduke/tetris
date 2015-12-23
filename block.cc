@@ -11,30 +11,37 @@ namespace tetris
 {
     static random_device rd;
     mt19937 RandomBlockFactory::random_gen(rd());
-    uniform_int_distribution<int> RandomBlockFactory::random_dis(1, 6);
+    uniform_int_distribution<int> RandomBlockFactory::random_dis(1, 10);
 
     Block * RandomBlockFactory::create_block(int y, int x)
     {
         Block * block = NULL;
 
-        // switch (random_dis(random_gen))
-        // {
-        // case STICK:
-        //     block = new StickBlock(y, x);
-        //     break;
-        // case SQUARE:
-        //     block = new SquareBlock(y, x);
-        //     break;
-        // default:
-        //     block = new SquareBlock(y, x);
-        //     break;
-        // }
-
-        int random = random_dis(random_gen);
-        if (random % 2 == 0)
+        switch (random_dis(random_gen))
+        {
+        case 1:
             block = new StickBlock(y, x);
-        else
+            break;
+        case 2:
             block = new SquareBlock(y, x);
+            break;
+        case 3:
+        case 7:
+            block = new ZBlock(y, x);
+            break;
+        case 4:
+        case 8:
+            block = new ReversedZBlock(y, x);
+            break;
+        case 5:
+        case 9:
+            block = new LBlock(y, x);
+            break;
+        case 6:
+        case 10:
+            block = new ReversedLBlock(y, x);
+            break;
+        }
 
         return block;
     }
@@ -135,7 +142,6 @@ namespace tetris
         return true;
     }
 
-    // Stick Block
     StickBlock::StickBlock(int y, int x) : Block()
     {
         Unit::Color color = Unit::RED;
@@ -149,10 +155,10 @@ namespace tetris
         rules[0].push_back(make_pair(0, -1));
         rules[0].push_back(make_pair(-1, -2));
 
-        rules[2].push_back(make_pair(-2, -1));
-        rules[2].push_back(make_pair(-1, 0));
-        rules[2].push_back(make_pair(0, 1));
-        rules[2].push_back(make_pair(1, 2));
+        rules[1].push_back(make_pair(-2, -1));
+        rules[1].push_back(make_pair(-1, 0));
+        rules[1].push_back(make_pair(0, 1));
+        rules[1].push_back(make_pair(1, 2));
     }
 
     SquareBlock::SquareBlock(int y, int x) : Block()
@@ -162,5 +168,101 @@ namespace tetris
         units.push_back(Unit(y, x+1, color));
         units.push_back(Unit(y+1, x, color));
         units.push_back(Unit(y+1, x+1, color));
+    }
+
+    ZBlock::ZBlock(int y, int x) : Block()
+    {
+        Unit::Color color = Unit::YELLOW;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y, x+1, color));
+        units.push_back(Unit(y+1, x+1, color));
+        units.push_back(Unit(y+1, x+2, color));
+
+        rules[0].push_back(make_pair(1, 1));
+        rules[0].push_back(make_pair(0, 0));
+        rules[0].push_back(make_pair(-1, 1));
+        rules[0].push_back(make_pair(-2, 0));
+
+        rules[1].push_back(make_pair(-1, -1));
+        rules[1].push_back(make_pair(0, 0));
+        rules[1].push_back(make_pair(1, -1));
+        rules[1].push_back(make_pair(2, 0));
+    }
+
+    ReversedZBlock::ReversedZBlock(int y, int x) : Block()
+    {
+        Unit::Color color = Unit::CYAN;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y, x-1, color));
+        units.push_back(Unit(y+1, x-1, color));
+        units.push_back(Unit(y+1, x-2, color));
+
+        rules[0].push_back(make_pair(0, -1));
+        rules[0].push_back(make_pair(1, 0));
+        rules[0].push_back(make_pair(0, 1));
+        rules[0].push_back(make_pair(1, 2));
+
+        rules[1].push_back(make_pair(0, 1));
+        rules[1].push_back(make_pair(-1, 0));
+        rules[1].push_back(make_pair(0, -1));
+        rules[1].push_back(make_pair(-1, -2));
+    }
+
+    LBlock::LBlock(int y, int x) : Block()
+    {
+        Unit::Color color = Unit::GREEN;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y+1, x, color));
+        units.push_back(Unit(y+2, x, color));
+        units.push_back(Unit(y+2, x+1, color));
+
+        rules[0].push_back(make_pair(2, 0));
+        rules[0].push_back(make_pair(0, 0));
+        rules[0].push_back(make_pair(-1, 1));
+        rules[0].push_back(make_pair(-1, 1));
+
+        rules[1].push_back(make_pair(-2, 0));
+        rules[1].push_back(make_pair(-1, 1));
+        rules[1].push_back(make_pair(0, 0));
+        rules[1].push_back(make_pair(1, -1));
+
+        rules[2].push_back(make_pair(1, 1));
+        rules[2].push_back(make_pair(2, 0));
+        rules[2].push_back(make_pair(1, -1));
+        rules[2].push_back(make_pair(0, -2));
+
+        rules[3].push_back(make_pair(-1, -1));
+        rules[3].push_back(make_pair(-1, -1));
+        rules[3].push_back(make_pair(0, 0));
+        rules[3].push_back(make_pair(0, 2));
+    }
+
+    ReversedLBlock::ReversedLBlock(int y, int x) : Block()
+    {
+        Unit::Color color = Unit::BLUE;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y+1, x, color));
+        units.push_back(Unit(y+2, x, color));
+        units.push_back(Unit(y+2, x-1, color));
+
+        rules[0].push_back(make_pair(1, -1));
+        rules[0].push_back(make_pair(1, -1));
+        rules[0].push_back(make_pair(0, 0));
+        rules[0].push_back(make_pair(0, 2));
+
+        rules[1].push_back(make_pair(1, 0));
+        rules[1].push_back(make_pair(-1, 0));
+        rules[1].push_back(make_pair(-2, -1));
+        rules[1].push_back(make_pair(-2, -1));
+
+        rules[2].push_back(make_pair(-1, -1));
+        rules[2].push_back(make_pair(0, 0));
+        rules[2].push_back(make_pair(1, 1));
+        rules[2].push_back(make_pair(2, 0));
+
+        rules[3].push_back(make_pair(-1, 2));
+        rules[3].push_back(make_pair(0, 1));
+        rules[3].push_back(make_pair(1, 0));
+        rules[3].push_back(make_pair(0, -1));
     }
 }

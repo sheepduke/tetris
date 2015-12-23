@@ -75,7 +75,7 @@ namespace tetris
     void Drawer::clear(const Block & block)
     {
         auto & units = block.get_units();
-
+        
         for (auto it = units.begin(); it != units.end(); it++)
         {
             Position pos = get_scaled_position(*it);
@@ -91,19 +91,7 @@ namespace tetris
         box(game_window, 0, 0);
         panel.traverse(this);
         mvwprintw(score_window, 3, 3, "%d", panel.score());
-        mvwprintw(score_window, 5, 3, "%dx%d", panel.height(), panel.width());
         wrefresh(game_window);
-        wrefresh(score_window);
-
-        // debug
-        for (int i = 0; i < 21; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                mvwprintw(score_window, i+3, j+3, "%d",
-                          (panel.is_legal(i, j) ? 1 : 0));
-            }
-        }
         wrefresh(score_window);
     }
     

@@ -2,14 +2,8 @@
 #include "block.hh"
 #include "unit.hh"
 
-// debug
-#include <fstream>
-
 namespace tetris
 {
-    static std::ofstream fout("log");
-    using std::endl;
-
     Panel::Panel(int height, int width)
     {
         m_height = height;
@@ -65,33 +59,26 @@ namespace tetris
             if (is_line_full)
             {
                 full_line_number++;
-                fout << "Before: " << endl;
-                print_test();
                 for (auto it = row->begin(); it != row->end(); it++)
                 {
                     delete *it;
                     *it = NULL;
-                    fout << *it << endl;
                 }
-                fout << "After: " << endl;
-                print_test();
                 row->clear();
-                units.erase(row);
 
-                // vector<Unit *> vec;
-                // vec.assign(m_width, NULL);
+                // change the position of rows before `row' and set Y to Y+1
+                for (auto it = units.begin(); it != row; it++)
+                {
+                    for (auto unit = it->begin(); unit != it->end(); unit++)
+                        if (*unit)
+                            (*unit)->set_y((*unit)->y() + 1);
+                }
+
+                units.erase(row++);
                 units.insert(units.begin(), vector<Unit *>(m_width, NULL));
             }
             else
                 row++;
-        }
-        // if there's any full lines, change all the Y value of each unit
-        if (full_line_number > 0)
-        {
-            for (auto row = units.begin(); row != units.end(); row++)
-                for (auto it = row->begin(); it != row->end(); it++)
-                    if (*it)
-                        (*it)->set_y((*it)->y() + full_line_number);
         }
         m_score += (10 + 5 * (full_line_number - 1)) * full_line_number;
     }
@@ -131,19 +118,6 @@ namespace tetris
             {
                 visitor->visit(*it);
             }
-        }
-    }
-
-    // debug
-    void Panel::print_test()
-    {
-        for (int i = 0; i < 21; i++)
-        {
-            for (int j = 0; j < 10; j++)
-            {
-                fout << (is_legal(i, j) ? "0" : "#");
-            }
-            fout << endl;
         }
     }
 }

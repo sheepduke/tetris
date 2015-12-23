@@ -27,11 +27,6 @@ namespace tetris
         static Block * create_block(int y, int x);
 
     private:
-        typedef int BlockType;
-        
-        static const BlockType STICK = 1;
-        static const BlockType SQUARE = 2;
-
         static mt19937 random_gen;
         static uniform_int_distribution<int> random_dis;
     };
@@ -74,11 +69,10 @@ namespace tetris
     };
 
     /**
-     * Block of stick.
-     *           0
-     *           1
-     *      3 2 2/1 0
-     *           3
+     * 0     
+     * 1
+     * 2  3210
+     * 3
      * This block has two angles: vertical stick and horizonal stick.
      */
     class StickBlock : public Block
@@ -88,14 +82,47 @@ namespace tetris
     };
 
     /**
-     * Block of four units consisting a square.
-     *           01
-     *           23
+     *  01
+     *  23
      **/
     class SquareBlock : public Block
     {
     public:
         SquareBlock(int y, int x);
+    };
+
+    /**
+     *       3
+     * 01   12
+     *  23  0
+     */
+    class ZBlock : public Block
+    {
+    public:
+        ZBlock(int y, int x);
+    };
+
+    /**
+     *          0
+     *   1 0    1 2
+     * 3 2        3
+     */
+    class ReversedZBlock : public Block
+    {
+    public:
+        ReversedZBlock(int y, int x);
+    };
+
+    class LBlock : public Block
+    {
+    public:
+        LBlock(int y, int x);
+    };
+
+    class ReversedLBlock : public Block
+    {
+    public:
+        ReversedLBlock(int y, int x);
     };
 }
 
