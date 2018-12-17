@@ -11,7 +11,7 @@ namespace tetris
 {
     static random_device rd;
     mt19937 RandomBlockFactory::random_gen(rd());
-    uniform_int_distribution<int> RandomBlockFactory::random_dis(1, 10);
+    uniform_int_distribution<int> RandomBlockFactory::random_dis(1, 7);
 
     Block * RandomBlockFactory::create_block(int y, int x)
     {
@@ -26,19 +26,18 @@ namespace tetris
             block = new SquareBlock(y, x);
             break;
         case 3:
-        case 7:
-            block = new ZBlock(y, x);
+            block = new TBlock(y, x);
             break;
         case 4:
-        case 8:
-            block = new ReversedZBlock(y, x);
+            block = new ZBlock(y, x);
             break;
         case 5:
-        case 9:
-            block = new LBlock(y, x);
+            block = new ReversedZBlock(y, x);
             break;
         case 6:
-        case 10:
+            block = new LBlock(y, x);
+            break;
+        case 7:
             block = new ReversedLBlock(y, x);
             break;
         }
@@ -264,5 +263,34 @@ namespace tetris
         rules[3].push_back(make_pair(0, 1));
         rules[3].push_back(make_pair(1, 0));
         rules[3].push_back(make_pair(0, -1));
+    }
+
+    TBlock::TBlock(int y, int x) : Block()
+    {
+        Unit::Color color = Unit::WHITE;
+        units.push_back(Unit(y, x, color));
+        units.push_back(Unit(y, x+1, color));
+        units.push_back(Unit(y, x+2, color));
+        units.push_back(Unit(y-1, x+1, color));
+
+        rules[0].push_back(make_pair(-1, 1));
+        rules[0].push_back(make_pair(0, 0));
+        rules[0].push_back(make_pair(1, -1));
+        rules[0].push_back(make_pair(1, 1));
+
+        rules[1].push_back(make_pair(1, -1));
+        rules[1].push_back(make_pair(0, 0));
+        rules[1].push_back(make_pair(-1, 1));
+        rules[1].push_back(make_pair(1, -1));
+
+        rules[2].push_back(make_pair(-1, 1));
+        rules[2].push_back(make_pair(0, 0));
+        rules[2].push_back(make_pair(1, -1));
+        rules[2].push_back(make_pair(-1, -1));
+
+        rules[3].push_back(make_pair(1, -1));
+        rules[3].push_back(make_pair(0, 0));
+        rules[3].push_back(make_pair(-1, 1));
+        rules[3].push_back(make_pair(-1, 1));
     }
 }

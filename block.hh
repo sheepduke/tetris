@@ -124,6 +124,17 @@ namespace tetris
     public:
         ReversedLBlock(int y, int x);
     };
+
+    /**
+     *   3     0                0
+     * 0 1 2   1 3    0 1 2   3 1
+     *         2        3       2
+     */
+    class TBlock : public Block
+    {
+    public:
+        TBlock(int y, int x);
+    };
 }
 
 #endif
