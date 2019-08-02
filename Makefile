@@ -1,11 +1,14 @@
-cc=clang++ -std=c++11 -pthread -g
+cc=c++ -std=c++17 -O1 -pthread -g
 target=tetris
-obj=main.o panel.o block.o drawer.o unit.cc
+obj=main.o panel.o block.o drawer.o unit.cpp
+build_dir=build
+src_dir=src
 
 tetris: $(obj)
-	$(cc) -o $(target) $(obj) -lncurses
+	mkdir -p build/
+	$(cc) -o $(build_dir)/$(target) $(build_dir)/$(obj) -lncurses
 
-%.o: %.cc
+%.o: $(src_dir)/%.cpp
 	$(cc) -c $<
 
 clean:
